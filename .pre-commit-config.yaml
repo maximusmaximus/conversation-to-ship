@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: zero-leak-security-scan
+        name: Zero-Leak Security & PII Scan
+        entry: python scripts/security_scan.py --root .
+        language: system
+        pass_filenames: false
+      - id: spec-consistency-check
+        name: Validate Specification & Model Matrix Link
+        entry: python scripts/validate_spec.py --root .
+        language: system
+        pass_filenames: false

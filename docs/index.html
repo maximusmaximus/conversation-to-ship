@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conversation-to-Ship — Turn Conversations Into Live Web Apps (Alpha)</title>
+  <meta name="description" content="In Alpha now: Start a conversation and leave with a live, working web application—with everyone on the call invited." />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="container">
+    <div class="alpha-banner" role="status">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong>Alpha Now</strong>
+        <span>We are currently in <strong>Alpha</strong>. Sign up with your Google account for admin validation or send us a message below.</span>
+      </div>
+      <a href="#contact" class="btn-secondary btn-sm">Request Alpha Access</a>
+    </div>
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">C2S</div>
+        <div>
+          <h1>Conversation-to-Ship</h1>
+          <div class="brand-sub">Start a conversation. Leave with a working web application.</div>
+        </div>
+      </div>
+
+      <nav class="nav-links" aria-label="Primary Navigation">
+        <button class="nav-btn active" data-view="home">Home</button>
+        <button class="nav-btn" data-view="dashboard" id="nav-dashboard">User Dashboard</button>
+        <button class="nav-btn" data-view="integrations" id="nav-integrations">Integrations</button>
+        <button class="nav-btn admin-nav hidden" data-view="admin" id="nav-admin">Admin</button>
+        <a class="nav-btn" href="#contact" id="nav-contact-link">Contact</a>
+        <div id="auth-nav-slot"></div>
+      </nav>
+    </header>
+
+    <!-- VIEW 1: MARKETING HOME & PUBLIC SHOWCASE -->
+    <main id="view-home">
+      <section class="hero">
+        <div class="pill-row">
+          <span class="pill amber">In Alpha Now</span>
+          <span class="pill emerald">Conversation to Live Web App</span>
+          <span class="pill cyan">Team &amp; Client Access</span>
+        </div>
+        <h2>Turn a normal meeting into a working web application.</h2>
+        <p>
+          Simply meet with your team or clients, talk through what you need, and get a live website built around what everyone agreed on—with people on the call automatically invited to the project.
+        </p>
+        <div class="hero-actions">
+          <button class="btn-primary" id="hero-connect-btn">Connect Account to Start Integrations</button>
+          <a class="btn-secondary" href="#contact">Contact Us</a>
+        </div>
+        <div class="benefit-grid">
+          <div class="benefit-card">
+            <h4>1. Start With a Conversation</h4>
+            <p>Hold a regular kickoff call with stakeholders—no spec docs required beforehand.</p>
+          </div>
+          <div class="benefit-card">
+            <h4>2. Everyone on the Call Included</h4>
+            <p>Teammates and guests who join your meeting link are ready to collaborate on what gets built.</p>
+          </div>
+          <div class="benefit-card">
+            <h4>3. Public, Private, or Hidden Control</h4>
+            <p>Share finished apps on the public showcase, keep client work private, or hide drafts whenever you want.</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Public Projects Filters">
+        <div class="section-head">
+          <div>
+            <h2>Public Projects</h2>
+            <div class="section-sub">Explore what creators are building now and past public launches. Projects set to <strong>Public</strong> appear here automatically.</div>
+          </div>
+          <div class="controls">
+            <input type="search" class="input" id="public-search" placeholder="Search public projects..." aria-label="Search public projects" />
+            <button class="filter-btn active" data-public-filter="ALL">All</button>
+            <button class="filter-btn" data-public-filter="DEPLOYED">Live</button>
+            <button class="filter-btn" data-public-filter="BUILDING">In Progress</button>
+            <button class="filter-btn" data-public-filter="GATE_1_PENDING">Scoping</button>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Current Public Projects">
+        <div class="section-head">
+          <h3>Current Public Projects <span class="pill cyan" id="current-public-count">0</span></h3>
+          <span class="section-sub">Active projects and current public launches across all users</span>
+        </div>
+        <div class="cards-grid" id="current-public-grid"></div>
+      </section>
+
+      <section aria-label="Past Public Projects">
+        <div class="section-head">
+          <h3>Past Public Projects <span class="pill violet" id="past-public-count">0</span></h3>
+          <span class="section-sub">Completed public apps shared by users</span>
+        </div>
+        <div class="cards-grid" id="past-public-grid"></div>
+      </section>
+
+      <!-- CONTACT SECTION -->
+      <section id="contact" class="contact-section" aria-label="Contact Us">
+        <div class="section-head" style="margin-bottom: 12px;">
+          <div>
+            <h2>Contact &amp; Alpha Access</h2>
+            <div class="section-sub">Questions, partnership ideas, or want faster Alpha verification after signing in? Send us a note.</div>
+          </div>
+        </div>
+        <form id="contact-form" class="form-grid">
+          <div class="field">
+            <label for="contact-name">Your Name</label>
+            <input class="input" id="contact-name" required placeholder="Your name" />
+          </div>
+          <div class="field">
+            <label for="contact-email">Email Address</label>
+            <input type="email" class="input" id="contact-email" required placeholder="you@example.com" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="contact-message">Message</label>
+            <textarea class="textarea" id="contact-message" rows="3" required placeholder="Tell us what you are building or ask a question..."></textarea>
+          </div>
+          <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn-primary">Send Message</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <!-- VIEW 2: USER DASHBOARD -->
+    <section id="view-dashboard" class="hidden">
+      <div id="dash-logged-out" class="empty-state hidden">
+        <h3>Sign in with Google to open your User Dashboard</h3>
+        <p>New accounts are queued for admin verification during Alpha. Once verified, you can connect integrations and publish or hide projects.</p>
+        <button class="btn-primary" id="dash-connect-btn">Connect Account to Start Integrations</button>
+      </div>
+
+      <div id="dash-logged-in" class="hidden">
+        <div class="profile-banner" id="user-profile-banner"></div>
+        <div id="admin-quick-banner" class="notice cyan hidden"></div>
+        <div id="user-pending-gate" class="notice hidden"></div>
+
+        <!-- VALIDATED USER WORKSPACE CONTROLS -->
+        <div id="validated-user-workspace" class="hidden">
+          <div class="kpi-grid" id="user-kpi-grid"></div>
+
+          <div class="form-panel">
+            <div class="section-head" style="margin-bottom: 12px;">
+              <div>
+                <h3>Start a New Project</h3>
+                <div class="section-sub">Projects set to <strong>Public</strong> appear immediately in the Home Page showcase.</div>
+              </div>
+            </div>
+            <form id="new-project-form" class="form-grid">
+              <div class="field">
+                <label for="new-proj-name">Project Name</label>
+                <input class="input" id="new-proj-name" required placeholder="e.g., Customer Onboarding Portal" />
+              </div>
+              <div class="field">
+                <label for="new-proj-visibility">Visibility</label>
+                <select class="select" id="new-proj-visibility">
+                  <option value="private">Private (Only you &amp; invited participants)</option>
+                  <option value="public">Public (Shown on Home Page)</option>
+                  <option value="hidden">Hidden (Tucked from default lists)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="new-proj-lifecycle">Home Page Section</label>
+                <select class="select" id="new-proj-lifecycle">
+                  <option value="current">Current Project</option>
+                  <option value="past">Past Project</option>
+                </select>
+              </div>
+              <div class="field" style="grid-column: 1 / -1;">
+                <label for="new-proj-summary">Project Summary</label>
+                <input class="input" id="new-proj-summary" placeholder="Brief description of what this project does..." />
+              </div>
+              <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="submit" class="btn-primary">Create Project</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <h3>My Projects &amp; Visibility</h3>
+              <div class="section-sub">List each project as <strong>Public</strong>, <strong>Private</strong>, or <strong>Hide</strong> it, and move finished launches to <strong>Past</strong>.</div>
+            </div>
+            <div class="controls">
+              <label class="filter-btn" style="display:inline-flex;align-items:center;gap:6px;">
+                <input type="checkbox" id="toggle-show-hidden" />
+                Show Hidden (<span id="hidden-count-label">0</span>)
+              </label>
+              <button class="filter-btn active" data-my-filter="ALL">All</button>
+              <button class="filter-btn" data-my-filter="public">Public</button>
+              <button class="filter-btn" data-my-filter="private">Private</button>
+            </div>
+          </div>
+
+          <div class="cards-grid" id="my-projects-grid"></div>
+
+          <div class="form-panel" style="margin-top: 8px;">
+            <div class="section-head" style="margin-bottom: 10px;">
+              <div>
+                <h3 style="margin:0;">My Recent Activity</h3>
+                <div class="section-sub">Your latest account actions across projects and integrations.</div>
+              </div>
+            </div>
+            <div class="action-timeline" id="my-recent-actions"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: EASY CLICK-THROUGH INTEGRATIONS DASHBOARD -->
+    <section id="view-integrations" class="hidden">
+      <div id="int-logged-out" class="empty-state hidden">
+        <h3>Connect your Google account to manage integrations</h3>
+        <p>Sign in and wait for admin validation to connect your calendar, meeting links, transcripts, and repository access.</p>
+        <button class="btn-primary" id="int-connect-btn">Connect Account to Start Integrations</button>
+      </div>
+
+      <div id="int-pending-gate" class="notice hidden"></div>
+
+      <div id="int-logged-in" class="hidden">
+        <div class="form-panel" id="onboarding-progress-panel"></div>
+        <div class="section-head">
+          <div>
+            <h2>Click-Through Integrations</h2>
+            <div class="section-sub">Click straight through to authorize each service with minimal copy-pasting.</div>
+          </div>
+        </div>
+        <div class="cards-grid" id="integrations-grid"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: ADMIN STATS, ACCOUNT MANAGEMENT & INLINE USER ACTIONS (ADMIN ONLY) -->
+    <section id="view-admin" class="hidden">
+      <div id="admin-access-denied" class="empty-state hidden">
+        <h3>Administrator Access Required</h3>
+        <p>Only the configured administrator account can view stats, validate users, and inspect user actions.</p>
+      </div>
+
+      <div id="admin-console" class="hidden">
+        <div class="section-head">
+          <div>
+            <h2>Admin Console — Stats, Accounts &amp; User Actions</h2>
+            <div class="section-sub">Verify newly signed-up accounts, inspect inline activity per user, manage projects, and review contact messages.</div>
+          </div>
+          <button class="btn-secondary btn-sm" id="admin-refresh-btn">Refresh Live Stats</button>
+        </div>
+
+        <div class="kpi-grid" id="admin-stats-grid"></div>
+
+        <!-- ACCOUNT MANAGEMENT WITH INLINE USER ACTIONS -->
+        <div class="admin-panel">
+          <div class="section-head" style="margin-bottom: 12px;">
+            <div>
+              <h3>Accounts &amp; Inline User Actions</h3>
+              <div class="section-sub">Validate accounts and view each user's actions inline directly beneath their account record.</div>
+            </div>
+            <div class="controls">
+              <button class="filter-btn active" data-admin-user-filter="ALL">All Users</button>
+              <button class="filter-btn" data-admin-user-filter="pending">Pending</button>
+              <button class="filter-btn" data-admin-user-filter="approved">Approved</button>
+              <button class="filter-btn" data-admin-user-filter="rejected">Revoked</button>
+            </div>
+          </div>
+          <div id="admin-users-list"></div>
+        </div>
+
+        <!-- GLOBAL USER ACTIONS STREAM -->
+        <div class="form-panel">
+          <div class="section-head" style="margin-bottom: 12px;">
+            <div>
+              <h3>All User Actions Log</h3>
+              <div class="section-sub">Chronological, cleanly formatted stream of actions across all users.</div>
+            </div>
+            <div class="controls">
+              <select class="select" id="admin-actions-user-filter">
+                <option value="">All Users</option>
+              </select>
+              <select class="select" id="admin-actions-type-filter">
+                <option value="">All Action Types</option>
+                <option value="user_signed_up">Signups</option>
+                <option value="user_signed_in">Sign-Ins</option>
+                <option value="project_created">Projects Created</option>
+                <option value="project_visibility_updated">Visibility Changes</option>
+                <option value="integration_configured">Integration Configs</option>
+                <option value="integration_oauth_connected">OAuth Connections</option>
+                <option value="integration_tested">Integration Tests</option>
+                <option value="admin_user_validated">Admin Validations</option>
+                <option value="contact_message_sent">Contact Inquiries</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Target</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="admin-actions-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ALL PROJECTS MANAGEMENT -->
+        <div class="form-panel">
+          <div class="section-head" style="margin-bottom: 12px;">
+            <div>
+              <h3>All Projects Across Accounts</h3>
+              <div class="section-sub">Inspect and manage visibility or lifecycle across every creator's projects.</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                  <th>Visibility</th>
+                  <th>Feed</th>
+                </tr>
+              </thead>
+              <tbody id="admin-projects-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CONTACT MESSAGES INBOX -->
+        <div class="form-panel">
+          <div class="section-head" style="margin-bottom: 12px;">
+            <div>
+              <h3>Contact &amp; Alpha Inquiries</h3>
+              <div class="section-sub">Messages submitted from the home page contact form.</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>Email</th>
+                  <th>Message</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-contacts-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span>Conversation-to-Ship · Alpha Release</span>
+      <span><a href="#contact" id="footer-contact-link">Contact</a> · <a href="https://github.com/maximusmaximus/conversation-to-ship" target="_blank" rel="noopener">GitHub</a></span>
+    </footer>
+  </div>
+
+  <!-- GOOGLE SIGN-IN MODAL -->
+  <div id="auth-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="auth-modal-title">Connect Google Account (Alpha)</h3>
+        <button class="btn-secondary btn-sm" id="close-auth-modal">Close</button>
+      </div>
+
+      <div class="notice cyan" style="margin-bottom: 12px;">
+        <strong>Alpha Verification:</strong> New Google accounts sign in as <strong>Pending Validation</strong> and appear in the admin console for verification before unlocking project creation and integrations.
+      </div>
+
+      <div id="gsi-container" style="margin-bottom: 12px;">
+        <div id="google-signin-button"></div>
+        <div id="google-not-configured-note" class="notice hidden" style="margin-top: 10px;"></div>
+      </div>
+
+      <details class="token-fallback" id="advanced-conn-details">
+        <summary>Service Connection Overrides (Optional)</summary>
+        <form id="backend-config-form" style="display: grid; gap: 10px; margin-top: 10px;">
+          <div class="field">
+            <label for="cfg-worker-url">Service API URL</label>
+            <input class="input" id="cfg-worker-url" placeholder="https://conversation-to-ship-api.example.workers.dev" />
+          </div>
+          <div class="field">
+            <label for="cfg-google-client-id">Google OAuth Web Client ID</label>
+            <input class="input" id="cfg-google-client-id" placeholder="1234567890-abcdef.apps.googleusercontent.com" />
+          </div>
+          <div style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn-secondary btn-sm">Save Connection Overrides</button>
+          </div>
+        </form>
+      </details>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

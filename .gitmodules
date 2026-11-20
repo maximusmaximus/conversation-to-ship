@@ -1,0 +1,3 @@
+[submodule "modules/model-matrix"]
+	path = modules/model-matrix
+	url = https://github.com/maximusmaximus/agentic-model-matrix.git

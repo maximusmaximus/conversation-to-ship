@@ -1,0 +1,18 @@
+{
+  "name": "conversation-to-ship-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloudflare Worker API, Google OAuth session gateway, D1 state store, and R2 artifact backend for the Conversation-to-Ship GitHub Pages Portal.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "db:migrate:local": "wrangler d1 migrations apply conversation_to_ship --local",
+    "db:migrate:remote": "wrangler d1 migrations apply conversation_to_ship --remote"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261119.1",
+    "typescript": "^5.7.0",
+    "wrangler": "^4.0.0"
+  }
+}

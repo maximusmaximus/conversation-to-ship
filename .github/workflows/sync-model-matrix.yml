@@ -1,0 +1,55 @@
+name: Sync Model Matrix Submodule
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # Weekly Monday 07:00 UTC (after weekly-matrix run)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-submodule:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Update modules/model-matrix to latest main
+        run: git submodule update --remote modules/model-matrix
+      - name: Validate alignment and zero-leak hygiene
+        run: |
+          python scripts/security_scan.py --root .
+          python scripts/validate_spec.py --root .
+          pytest -v
+      - name: Open PR if submodule pointer updated
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet modules/model-matrix; then
+            echo "Submodule modules/model-matrix is already up to date."
+            exit 0
+          fi
+          SHA=$(git -C modules/model-matrix rev-parse --short HEAD)
+          WEEK=$(python -c "import json; print(json.load(open('modules/model-matrix/routing.json'))['week_id'])")
+          BRANCH="chore/sync-model-matrix-${WEEK}-${SHA}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add modules/model-matrix
+          git commit -m "chore: sync agentic-model-matrix submodule (${WEEK} @ ${SHA})"
+          git push -u origin "$BRANCH" --force
+          gh pr create \
+            --title "chore: sync agentic-model-matrix (${WEEK} @ ${SHA})" \
+            --body "Updates \`modules/model-matrix\` submodule to \`${SHA}\` and verifies CI alignment." \
+            --base main \
+            --head "$BRANCH" || echo "PR already open for ${BRANCH}"

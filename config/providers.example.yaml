@@ -1,0 +1,84 @@
+# Swappable Provider Registry Configuration (Sanitized Example)
+# Copy to config/providers.yaml for local/production customization.
+
+version: 1
+
+active_providers:
+  booking: calendly            # options: calendly | generic_webhook
+  calendar: google_calendar    # options: google_calendar | generic_ics | outlook_stub
+  meeting: google_meet         # options: google_meet | generic_link
+  transcript: read_ai          # options: read_ai | google_meet_drive | manual_upload
+  repo: github                 # options: github
+  deploy: cloudflare           # options: cloudflare
+
+secondary_adapters_enabled:
+  transcript:
+    - google_meet_drive
+    - manual_upload
+  calendar:
+    - generic_ics
+    - outlook_stub
+
+correlation:
+  cascade_order:
+    - meet_url_code
+    - calendar_ical_uid
+    - calendly_event_uri
+    - time_window_plus_email
+  time_window_minutes: 15
+
+onboarding:
+  capture_sources:
+    - calendar_invitees
+    - meet_participants_api
+    - readai_roster
+    - oauth_claim_link
+  default_repo_visibility: private
+  default_joiner_permission: push   # pull | triage | push | maintain
+  invite_timing: after_gate_2       # after_gate_2 | immediate_on_claim
+
+research:
+  max_minutes_per_item: 4
+  max_web_queries_per_item: 5
+  auto_prefill_low_risk: true
+  require_human_choice_high_impact: true
+
+model_routing:
+  matrix_source: submodule          # submodule | pages_api | raw_feed
+  submodule_path: modules/model-matrix/routing.json
+  pages_url: https://maximusmaximus.github.io/agentic-model-matrix/routing.json
+  llms_manifest_url: https://maximusmaximus.github.io/agentic-model-matrix/llms.txt
+  expected_schema_version: "1.1.0"
+  verify_content_hash: true
+  require_pr_merged_updates: true
+  enforce_gemini_antigravity_build: true
+  orchestrator_parallel_subagents: true
+
+antigravity_bridge:
+  mode: hybrid_terminal_tabs        # hybrid_terminal_tabs | headless_stream
+  terminal: windows_terminal        # windows_terminal | shell_spawn
+  tab_states:
+    - id: requirements
+      title: "1-Requirements"
+      stage_ref: consensus_specs
+    - id: research
+      title: "2-Research"
+      stage_ref: research
+    - id: specs
+      title: "3-Specs"
+      stage_ref: architecture
+    - id: app_build
+      title: "4-Gemini-Build"
+      stage_ref: app_build
+    - id: qa_deploy
+      title: "5-QA-Deploy"
+      stage_ref: qa_deploy
+
+cloudflare:
+  use_workers: true
+  use_r2: true
+  r2_prefixes:
+    transcripts: "projects/{project_id}/transcripts/"
+    research: "projects/{project_id}/research/"
+    build_logs: "projects/{project_id}/logs/"
+    artifacts: "projects/{project_id}/artifacts/"

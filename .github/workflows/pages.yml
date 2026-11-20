@@ -1,0 +1,54 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Verify zero-leak hygiene, spec alignment, and tests
+        run: |
+          python scripts/security_scan.py --root .
+          python scripts/validate_spec.py --root .
+          pytest -v
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

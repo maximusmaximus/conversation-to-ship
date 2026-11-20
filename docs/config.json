@@ -1,0 +1,7 @@
+{
+  "workerApiUrl": "https://conversation-to-ship-api.maxinfeld-artshow.workers.dev",
+  "googleClientId": "",
+  "matrixRoutingUrl": "https://maximusmaximus.github.io/agentic-model-matrix/routing.json",
+  "matrixStatsUrl": "https://maximusmaximus.github.io/agentic-model-matrix/stats.json",
+  "repoUrl": "https://github.com/maximusmaximus/conversation-to-ship"
+}

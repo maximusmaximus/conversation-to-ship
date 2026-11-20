@@ -1,0 +1,31 @@
+# Python & Node
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+.next/
+.wrangler/
+dist/
+build/
+
+# Secrets & local runtime state (never commit live meeting/attendee data)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+config/providers.yaml
+data/
+meetings/
+runtime/
+logs/
+*.sqlite
+*.db
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
